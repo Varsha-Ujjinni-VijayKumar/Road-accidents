@@ -2,14 +2,63 @@
 title: "readme"
 author: "Varsha Ujjinni Vijay Kumar"
 date: "07/06/2021"
-output: html_document
+output: 
+    html_document:
+        theme: sandstone
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+Hey everyone!! Thank you for taking your time in looking at this repository for the **Road Accidents in Australia** dashboard. As the data for this dashboard is really big, it is very clumsy to upload all of the data sets for the proper working of the shiny dashboard. 
 
+Please follow the following steps to get the data in the form that is needed to get the appropriate data for its working. 
+
+1. The data is taken from [here](https://www.kaggle.com/mgray39/australia-new-zealand-road-crash-dataset), please download all of the tables present in this data set.
+
+2. After downloading all of the tables from the above link, create a RMD file and use the follwing code for its reading:
+
+```{r readdata,eval=FALSE}
+casualty <- read.csv(here::here("data","Casualties.csv"))
+crash <- read.csv(here::here("data","Crash.csv"))
+date <- read.csv(here::here("data","DateTime.csv"))
+descp <- read.csv(here::here("data","Description.csv"))
+loc <- read.csv(here::here("data","Location.csv"))
+veh <- read.csv(here::here("data","Vehicles.csv"))
+crash <- read.csv(here::here("data","Crash.csv"))
 ```
+
+3. Use the following tidy code for the datasets:
+
+```{r datatidy,eval=FALSE}
+casualty <- read.csv(here::here("data","Casualties.csv")) %>%
+  select(-X) %>%
+  na.omit()
+
+date <- read.csv(here::here("data","DateTime.csv")) %>%
+  select(-c(X, day_of_month))
+
+descp <- read.csv(here::here("data","Description.csv"))%>%
+  select(-X)
+
+loc <- read.csv(here::here("data","Location.csv")) %>% filter(country == "AU") %>%
+  na.omit() %>%
+  select(-X)
+
+veh <- read.csv(here::here("data","Vehicles.csv"))
+accidents <- crash %>%
+  left_join(casualty, by = "casualties_id") %>%
+  left_join(date, by = "date_time_id") %>%
+  left_join(descp,by = "description_id") %>%
+  left_join(loc, by = "lat_long") %>%
+  left_join(veh, by = "vehicles_id") %>%
+  select(-c(X.x,X.y))
+
+write.csv(here::here("data","accidents.csv"))
+```
+
+
+4. Finally use this data and run the app.R file for the shiny dashboard. 
+
 
